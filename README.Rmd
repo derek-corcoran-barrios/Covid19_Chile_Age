@@ -19,7 +19,7 @@ library()
 
 ### Cantidad de contactos diarios y matriz de contactos entre edades 
 
-Para determinar la cantidad de contactos diarios y la matriz de contactos entre edades utilizaremos el sript `Matriz_de_Contacto_Edades.R`, utilizamos la base de datos de @prem2017projecting como base recalculando para los grupos de edad que usamos (0-25, 25-65 y 65+).
+Para determinar la cantidad de contactos diarios y la matriz de contactos entre edades utilizaremos el sript `Bases_de_datos/Matriz_de_Contacto_Edades.R`, utilizamos la base de datos de @prem2017projecting como base recalculando para los grupos de edad que usamos (0-25, 25-65 y 65+).
 
 El primer resultado, que encontramos en las lineas 31-37 del código y guardadas en `Bases_de_datos/Contactos.rds` nos dice que para los grupos antes establecidos en número de contactos diarios promedio es de `r round(read_rds("Bases_de_datos/Contactos.rds"),2)` por persona respectivamente.
 
@@ -32,7 +32,9 @@ knitr::kable(read_rds("Bases_de_datos/Age_Matrix.rds"), digits = 2, booktabs = T
 
 ### Probabilidad de contactos entre comunas
 
-Para esto hay dos scripts generados, uno que pe
+Para esto hay dos scripts generados, uno que permite generar una matriz de probabilidad de viajes entre todas las comunas de Chile, y otro que lo hace para alguna región particular de Chile.
+
+
 
 ### Estado inicial del modelo
 
