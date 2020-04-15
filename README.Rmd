@@ -1,0 +1,43 @@
+---
+title: "Organización de modelos para covid19 usando "
+output: github_document
+bibliography: biblio.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, error = FALSE, warning = FALSE)
+library(tidyverse)
+library()
+```
+
+## Paquetes necesarios para el uso completo de este repositorio
+
+* **tidyverse**
+* **readxl**
+
+## Generación de bases de datos y estimación de parametros
+
+### Cantidad de contactos diarios y matriz de contactos entre edades 
+
+Para determinar la cantidad de contactos diarios y la matriz de contactos entre edades utilizaremos el sript `Matriz_de_Contacto_Edades.R`, utilizamos la base de datos de @prem2017projecting como base recalculando para los grupos de edad que usamos (0-25, 25-65 y 65+).
+
+El primer resultado, que encontramos en las lineas 31-37 del código y guardadas en `Bases_de_datos/Contactos.rds` nos dice que para los grupos antes establecidos en número de contactos diarios promedio es de `r round(read_rds("Bases_de_datos/Contactos.rds"),2)` por persona respectivamente
+
+### Probabilidad de contactos entre comunas
+
+Para esto
+
+### Estado inicial del modelo
+
+
+
+## Modelaciones
+
+
+## Resultados
+
+
+## Difusión
+
+
+## Referencias
