@@ -12,6 +12,8 @@ library()
 
 ## Paquetes necesarios para el uso completo de este repositorio
 
+* **doParallel**
+* **lubridate**
 * **tidyverse**
 * **readxl**
 
@@ -41,6 +43,9 @@ Para las Regiones el estado incial de cada Fecha se guardara en una carpeta de d
 Existe un tercer script `Cada_Region.R`, ese script contiene un loop que actualiza todas las regiones.
 
 ## Modelaciones
+
+Los scripts y funciones necesarias para generar los modelos se encuentran en la base de datos `Modelos`, se recomienda testear con un modelo para una sola región, ya que modelos para todo el país pueden ser en extremo lentos.
+
 
 
 ## Resultados

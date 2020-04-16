@@ -3,6 +3,8 @@ Organización de modelos para covid19 usando
 
 ## Paquetes necesarios para el uso completo de este repositorio
 
+  - **doParallel**
+  - **lubridate**
   - **tidyverse**
   - **readxl**
 
@@ -39,10 +41,11 @@ contacto con el de cada columna:
 
 Para esto hay dos scripts generados, uno que permite generar un estado
 inicial y matriz de probabilidad de viajes entre todas las comunas de
-Chile `Bases_de_datos/Probabilidad_Viaje_Comunas`, y otro que lo hace
-para alguna región particular de Chile. Para ambos scripts es necesario
-utilzar las bases de datos `Bases_de_datos/Viajes_comunas.rds`(para los
-viajes intercomunales),
+Chile `Bases_de_datos/Probabilidad_Viaje_Comunas.R`, y otro que lo hace
+para alguna región particular de Chile
+`Bases_de_datos/Probabilidad_Viaje_Comunas_por_Region.R`. Para ambos
+scripts es necesario utilzar las bases de datos
+`Bases_de_datos/Viajes_comunas.rds`(para los viajes intercomunales),
 `Bases_de_datos/Cantidad-de-Personas-por-Sexo-y-Edad.xlsx` (Para los
 grupos de edad y poblacion por comunas) y `Bases_de_datos/Pais.rds`
 (Para tener los Infectados, Acumulados y recuperados), esta última base
@@ -51,11 +54,20 @@ de datos puede ser actualizada con las primeras 17 lineas del código.
 La bases de datos de Chile para el estado inicial de cada fecha se
 guardará en `Bases_de_datos/Datos_Chile/df_out_2020-04-13.rds` con la
 fecha, las Probabilidades
-\`Bases\_de\_datos/Datos\_Chile/Probs\_2020-04-13.rds
+`Bases_de_datos/Datos_Chile/Probs_2020-04-13.rds`
 
-\`
+Para las Regiones el estado incial de cada Fecha se guardara en una
+carpeta de datos de la comuna respectiva.
+
+Existe un tercer script `Cada_Region.R`, ese script contiene un loop que
+actualiza todas las regiones.
 
 ## Modelaciones
+
+Los scripts y funciones necesarias para generar los modelos se
+encuentran en la base de datos `Modelos`, se recomienda testear con un
+modelo para una sola región, ya que modelos para todo el país pueden ser
+en extremo lentos.
 
 ## Resultados
 
