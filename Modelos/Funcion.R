@@ -238,6 +238,8 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*df_out[[x]]$n_i_g_eff)
   }
   
+  d = 1
+  
   df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(d %in% Dias_Cuar ~ K_Cuar, !(d %in% Dias_Cuar) ~ 0)))
   
   df_out <- df_out %>% purrr::map(~mutate(.x, K_g = (1 - K_0)*K_g + K_0*(Sigma - 1)))

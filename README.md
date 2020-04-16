@@ -76,6 +76,9 @@ las bases de datos que encontramos en `Funcion.r`
 
 ## Difusión
 
+Dentro de la carpeta difusión se encuentran distintos porductos
+generados a partír de los resultados de este modelo
+
 ## Referencias
 
 <div id="refs" class="references">
