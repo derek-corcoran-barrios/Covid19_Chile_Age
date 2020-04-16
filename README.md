@@ -50,7 +50,10 @@ de datos puede ser actualizada con las primeras 17 lineas del código.
 
 La bases de datos de Chile para el estado inicial de cada fecha se
 guardará en `Bases_de_datos/Datos_Chile/df_out_2020-04-13.rds` con la
-fecha
+fecha, las Probabilidades
+\`Bases\_de\_datos/Datos\_Chile/Probs\_2020-04-13.rds
+
+\`
 
 ## Modelaciones
 
