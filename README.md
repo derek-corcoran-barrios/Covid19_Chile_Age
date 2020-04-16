@@ -69,6 +69,9 @@ encuentran en la base de datos `Modelos`, se recomienda testear con un
 modelo para una sola región, ya que modelos para todo el país pueden ser
 en extremo lentos.
 
+El script `Modelos/Modelo.R` es el que corre las simulaciones, usando
+las bases de datos que encontramos en `Funcion.r`
+
 ## Resultados
 
 ## Difusión
