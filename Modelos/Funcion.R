@@ -183,4 +183,5 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
   stopCluster(cl)
   
   Results <- bind_rows(Results) %>% mutate(Fecha = Inicio + (Time-1))   %>% mutate(Cuarentena = case_when(K_0 > 0~ "Cuarentena", K_0 == 0~ " Sin cuarentena"))
+  return(Results)
 }
