@@ -40,7 +40,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
   z_g <- vector()
   
   for(x in 1:length(df_out)){
-    z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*df_out[[x]]$n_i_g_eff)
+    z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
   }
   
   df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(Prevalencia >= Umbral ~ K_Cuar, Prevalencia < Umbral ~ 0)))
@@ -89,7 +89,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     z_g <- vector()
     
     for(x in 1:length(df_out)){
-      z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*df_out[[x]]$n_i_g_eff)
+      z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
     }
     
     N_I_h_j_i <- list(Mat, Mat, Mat)
@@ -128,7 +128,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
       Temp2 <- list()
       for(h in 1:3){
         temp <- foreach(j = 1:nrow(df_out[[g]]), .inorder = T, .packages = c("dplyr")) %dopar% {
-          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
+          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
         }
         Temp2[[h]] <- purrr::reduce(temp, `*`)
       }
@@ -235,7 +235,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
   z_g <- vector()
   
   for(x in 1:length(df_out)){
-    z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*df_out[[x]]$n_i_g_eff)
+    z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
   }
   
   d = 1
@@ -286,7 +286,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     z_g <- vector()
     
     for(x in 1:length(df_out)){
-      z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*df_out[[x]]$n_i_g_eff)
+      z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
     }
     
     N_I_h_j_i <- list(Mat, Mat, Mat)
@@ -325,7 +325,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
       Temp2 <- list()
       for(h in 1:3){
         temp <- foreach(j = 1:nrow(df_out[[g]]), .inorder = T, .packages = c("dplyr")) %dopar% {
-          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
+          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
         }
         Temp2[[h]] <- purrr::reduce(temp, `*`)
       }

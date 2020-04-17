@@ -13,11 +13,11 @@ Inicio = dmy("15-04-2020")
 
 ### Leer probabilidades de migracion
 
-Probs <- read_rds("Bases_de_datos/Datos_Magallanes/Probs_2020-04-15.rds")
+Probs <- read_rds("Bases_de_datos/Datos_Valparaíso/Probs_2020-04-15.rds")
 
 ### Leer condiciones iniciales
 
-df_out <- read_rds("Bases_de_datos/Datos_Magallanes/df_out_2020-04-15.rds") 
+df_out <- read_rds("Bases_de_datos/Datos_Valparaíso/df_out_2020-04-15.rds") 
 
 #Infectividad de asintomaticos
 betaA = 0.06
@@ -70,21 +70,17 @@ Sigma = 3.1
 
 C_G_H <- read_rds("Bases_de_datos/Age_Matrix.rds")
 
-Betas = seq(from = 0.02, to = 0.1, by = 0.02)
-Resultados <- list()
 
-for(i in 1:length(Betas)){
-  Resultados[[i]] <- Modelo_Edad(Inicio = Inicio, df_out = df_out, Probs = Probs, betaI = Betas[i], betaA = Betas[i], Eta = Eta,K_g = K_g, Alpha_g = Alpha_g, Mu_g = Mu_g, Gamma_g = Gamma_g, Omega_g = Omega_g, Psi_g = Psi_g, Chi_g = Chi_g, Epsilon = Epsilon, p_G = p_G, Sigma = Sigma, C_G_H= C_G_H, Dias = 30, K_Cuar = 0.5, Umbral = 40, ncores = 4)
-}
+Resultados <- Modelo_Edad(Inicio = Inicio, df_out = df_out, Probs = Probs, betaI = betaI, betaA = betaA, Eta = Eta,K_g = K_g, Alpha_g = Alpha_g, Mu_g = Mu_g, Gamma_g = Gamma_g, Omega_g = Omega_g, Psi_g = Psi_g, Chi_g = Chi_g, Epsilon = Epsilon, p_G = p_G, Sigma = Sigma, C_G_H= C_G_H, Dias = 20, K_Cuar = 0.5, Umbral = 40, ncores = 4)
 
-Results <- Resultados %>% purrr::map(~ .x$Results) %>% purrr::map2(.y = Betas, ~mutate(.x, Beta = as.character(.y))) %>% reduce(bind_rows)
+Results <- Resultados$Results
 
 #Resultados2 <- Modelo_Edad_Total(Inicio = Inicio, df_out = df_out, Probs = Probs, betaI = betaI, betaA = betaA, Eta = Eta,K_g = K_g, Alpha_g = Alpha_g, Mu_g = Mu_g, Gamma_g = Gamma_g, Omega_g = Omega_g, Psi_g = Psi_g, Chi_g = Chi_g, Epsilon = Epsilon, p_G = p_G, Sigma = Sigma, C_G_H= C_G_H, Dias = 30, K_Cuar = 0.5, Dias_Cuar = 5:20, ncores = 4)
 
 #Results <- Resultados$Results %>% mutate(Estrategia = "Cuarentena dinámica")
 Results <- Results %>% dplyr::filter(Comuna != "pais")
 
-ggplot(Results, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Beta)) + facet_wrap(~Comuna, scales = "free_y") + theme_bw()
+ggplot(Results, aes(x = Fecha, y = Infectados)) + geom_line() + facet_wrap(~Comuna, scales = "free_y") + theme_bw()
 
 Results <-list(
   Resultados[[1]]$Results %>% mutate(PS = as.character(0.5)),
