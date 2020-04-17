@@ -128,9 +128,9 @@ Viajes_Comunas <- Viajes_Comunas  %>% mutate(origen = str_to_lower(origen)) %>% 
   mutate(destino = str_replace_all(destino, "á", "a"), destino = str_replace_all(destino, "é", "e"), destino = str_replace_all(destino, "í", "i"), destino = str_replace_all(destino, "ó", "o"), destino = str_replace_all(destino, "ú", "u")) %>% dplyr::filter(destino != "total") %>% mutate(destino  = str_replace_all(destino, "marchigüe", "marchihue"), origen  = str_replace_all(origen, "marchigüe", "marchihue"))%>% mutate(destino  = str_replace_all(destino, "paihuano", "paiguano"), origen  = str_replace_all(origen, "paihuano", "paiguano")) %>% 
   mutate(destino = ifelse(destino %in% unique(Pais$Comuna), destino, "pais"), origen = ifelse(origen %in% unique(Pais$Comuna), origen, "pais")) %>% group_by(origen, destino) %>% summarise_if(is.numeric, sum) %>% ungroup()
 
+Areas <- read_rds("Bases_de_datos/Areas.rds") %>% mutate(Comuna = ifelse(Comuna %in% unique(Viajes_Comunas$origen), Comuna, "pais")) %>% group_by(Comuna) %>% summarise_if(is.numeric, sum) %>% ungroup()
 
-df_out <- df_out %>% purrr::map(~dplyr::filter(.x, Comuna %in% unique(Viajes_Comunas$origen)))
-
+df_out <- df_out %>% purrr::map(~dplyr::filter(.x, Comuna %in% unique(Viajes_Comunas$origen))) %>% purrr::map(~left_join(.x, Areas))
 
 saveRDS(df_out, paste0("Bases_de_datos/Datos_",Region_Seleccionada, "/df_out_", Fecha_Reciente, ".rds")) 
 

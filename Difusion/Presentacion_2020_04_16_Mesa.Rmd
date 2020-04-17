@@ -32,7 +32,7 @@ knitr::include_graphics("Compartimientos_Modelo_Arenas.png")
 ```
 
 
-## Con conecciones espaciales
+## Con conexiones espaciales
 
 ```{r, fig.align='center'}
 require(igraph)
@@ -120,9 +120,11 @@ ggplot(Grafico_Comuna, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrateg
 
 ## Fallecidos
 
-```{r, out.width='90%', fig.align='center'}
+```{r, out.width='70%', fig.align='center'}
 ggplot(Grafico_Comuna, aes(x = Fecha, y = Fallecidos)) + geom_line(aes(color = Estrategia)) + facet_wrap(~Comuna) + theme_bw()+ scale_y_continuous(labels = scales::comma) + theme(legend.position = "bottom")
 ```
+
+[Mas Comunas](https://www.ecoinformatica.net/COVID19.html)
 
 ## Nacional UCI
 
@@ -145,7 +147,7 @@ ggplot(Grafico_Nacional, aes(x = Fecha, y = Fallecidos)) + geom_line(aes(color =
 ggplot(Grafico_Nacional, aes(x = Fecha, y = Infectados_Acumulados)) + geom_line(aes(color = Estrategia)) + theme_bw()  + scale_y_continuous(labels = scales::comma) + ylab("Infectados Acumulados") + theme(legend.position = "bottom")
 ```
 
-## Tiempo de cuarentena naciona
+## Tiempo de cuarentena nacional
 
 * Empezando el modelo el 10 de abril
 
@@ -165,17 +167,17 @@ ggplot(ResultadosNac, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategi
 ## Recomendaciones
 
 * Debiera instaurarse una cuarentena nacional
-* Resultados preeliminares dicen que cuanto mas temprano empieze la cuarentena nacional es mejor
+* Resultados preliminares dicen que cuanto mas temprano empieza la cuarentena nacional es mejor
 * Esto beneficiará más a las comunas que no han tenido cuarentenas
-* Antes del peak la probabilidad de que que haya no hayan infectados, expuestos o asintomaticos en una casa bajan en el tiempo $CH_{i(t)}$
+* Antes del peak la probabilidad de que que haya no hayan infectados, expuestos o asintomáticos en una casa bajan en el tiempo $CH_{i(t)}$
 
 ## Necesidades
 
 * Transparencia en los datos por comuna
 * Entrega de datos de Recuperados, Fallecidos, etc por comuna
-* En un mundo ideal, generacion de API para acceder a datos
+* En un mundo ideal, generación de API para acceder a datos
 
 ## Recursos
 
-* Repositorio (github)[https://github.com/derek-corcoran-barrios/Covid19_Chile_Age0] con los modelos y bases de datos
-* Visualizador (de datos)[https://www.ecoinformatica.net/COVID19.html]
+* Repositorio [github](https://github.com/derek-corcoran-barrios/Covid19_Chile_Age) con los modelos y bases de datos
+* Visualizador [de datos](https://www.ecoinformatica.net/COVID19.html)
