@@ -12,6 +12,8 @@ Pais <- read_csv("COVID_tasaXcomunas.csv")
 Pais <- Pais %>% mutate_at(as.numeric, .vars = vars(5:ncol(Pais))) %>% dplyr::select(-codigo_region, -codigo_comuna) %>% pivot_longer(cols = c(-region, -comuna), names_to = "Fecha", values_to = "Acumulados") %>% mutate(Fecha = mdy(Fecha), Acumulados = ifelse(is.na(Acumulados), 0, Acumulados)) %>% rename(Comuna = comuna)  %>% mutate(Comuna = str_to_lower(Comuna)) %>% mutate(Comuna = str_remove_all(Comuna, " \\*")) %>%
   mutate(Comuna = str_replace_all(Comuna, "á", "a"), Comuna = str_replace_all(Comuna, "é", "e"), Comuna = str_replace_all(Comuna, "í", "i"), Comuna = str_replace_all(Comuna, "ó", "o"), Comuna = str_replace_all(Comuna, "ú", "u")) %>% dplyr::filter(Comuna != "total") %>% mutate(Comuna = str_replace_all(Comuna, "aisen", "aysen"))
 
+
+
 saveRDS(Pais, "Bases_de_datos/Pais.rds")
 
 
@@ -113,8 +115,9 @@ Viajes_Comunas <- Viajes_Comunas  %>% mutate(origen = str_to_lower(origen)) %>% 
   mutate(destino = str_to_lower(destino)) %>% mutate(destino = str_remove_all(destino, " \\*")) %>%
   mutate(destino = str_replace_all(destino, "á", "a"), destino = str_replace_all(destino, "é", "e"), destino = str_replace_all(destino, "í", "i"), destino = str_replace_all(destino, "ó", "o"), destino = str_replace_all(destino, "ú", "u")) %>% dplyr::filter(destino != "total") %>% mutate(destino  = str_replace_all(destino, "marchigüe", "marchihue"), origen  = str_replace_all(origen, "marchigüe", "marchihue"))%>% mutate(destino  = str_replace_all(destino, "paihuano", "paiguano"), origen  = str_replace_all(origen, "paihuano", "paiguano"))
 
+Areas <- read_rds("Bases_de_datos/Areas.rds") 
 
-df_out <- df_out %>% purrr::map(~dplyr::filter(.x, Comuna %in% unique(Viajes_Comunas$origen)))
+df_out <- df_out %>% purrr::map(~dplyr::filter(.x, Comuna %in% unique(Viajes_Comunas$origen))) %>% purrr::map(~left_join(.x, Areas))
 
 df_out[[2]]$Comuna[!(df_out[[2]]$Comuna %in% unique(Viajes_Comunas$destino))]
 
