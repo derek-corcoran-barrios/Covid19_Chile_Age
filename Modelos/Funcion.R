@@ -1,4 +1,4 @@
-Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, Mu_g, Gamma_g, Omega_g, Psi_g, Chi_g, Epsilon, p_G, Sigma, C_G_H, Dias, K_Cuar, Umbral = 40, ncores){
+Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, Mu_g, Gamma_g, Omega_g, Psi_g, Chi_g, Epsilon, p_G, Sigma, C_G_H, Dias, K_Cuar, Umbral = 40, ncores, Min_Days = 14){
   prevalencias <- df_out %>% bind_rows() %>% group_by(Comuna, Poblacion) %>% summarise(Infectados = sum(Infectados)) %>% mutate(Prevalencia = (Infectados/Poblacion)*100000) %>% ungroup()  %>%  dplyr::pull(Prevalencia) 
   for(i in 1:length(df_out)){
     df_out[[i]]$Prevalencia <- prevalencias
@@ -6,9 +6,23 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
   
   Nombres <- df_out$Under_25$Comuna
   
-  df_out <- df_out %>% purrr::map2(.y = K_g, ~mutate(.x, K_g = .y))
+  df_out <- df_out %>% purrr::map2(.y = K_g, ~mutate(.x, K_g = .y, Count = 0))
+  
+  df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(Count > 0 & Count != Min_Days ~ K_Cuar,
+                                                              Count == 0 & Prevalencia >= Umbral ~ K_Cuar,
+                                                              Count == 0 & Prevalencia < Umbral ~ 0,
+                                                              Count == Min_Days & Prevalencia >= Umbral ~ K_Cuar,
+                                                              Count == Min_Days & Prevalencia < Umbral ~ 0),
+                                          Count = case_when(Count > 0 & Count != Min_Days ~ Count + 1,
+                                                            Count == 0 & Prevalencia >= Umbral ~ Count + 1,
+                                                            Count == 0 & Prevalencia < Umbral ~ 0,
+                                                            Count == Min_Days & Prevalencia >= Umbral ~ 1,
+                                                            Count == Min_Days & Prevalencia < Umbral ~ 0)
+  ))
   
   df_out <- df_out %>% purrr::map2(.y = p_G, ~mutate(.x, p_G = .y))
+  
+  df_out  <- df_out %>% purrr::map(~mutate(.x, p_G_c = (1 - K_0)*p_G))
   
   Mat  <- matrix(rep(0,(length(Nombres)*length(Nombres))), nrow = length(Nombres), ncol = length(Nombres))
   
@@ -29,7 +43,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     #Para cada Comuna
     for(R in 1:nrow(df_out[[x]])){
       n_i_g_eff <- foreach(i = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-        ((1 - df_out[[x]]$p_G[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
+        ((1 - df_out[[x]]$p_G_c[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
       }
       df_out[[x]][R,]$n_i_g_eff <- sum(n_i_g_eff) 
     }
@@ -43,9 +57,8 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
   }
   
-  df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(Prevalencia >= Umbral ~ K_Cuar, Prevalencia < Umbral ~ 0)))
   
-  df_out <- df_out %>% purrr::map(~mutate(.x, K_g = (1 - K_0)*K_g + K_0*(Sigma - 1)))
+  df_out <- df_out %>% purrr::map(~mutate(.x, K_g_c = (1 - K_0)*K_g + K_0*(Sigma - 1)))
   
   Div3 <- function(x){
     return(x/3)
@@ -53,7 +66,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
   
   Results <- list()
   
-  Results[[1]] <- df_out %>% bind_rows() %>% dplyr::select(-Poblacion, -n_i_g_eff) %>% rename(Poblacion = Generacion) %>% group_by(Comuna) %>% summarise_if(is.numeric, sum) %>% mutate_at(vars(Time:K_0), Div3)
+  Results[[1]] <- df_out %>% bind_rows() %>% dplyr::select(-Poblacion, -n_i_g_eff, -Count) %>% rename(Poblacion = Generacion) %>% group_by(Comuna) %>% summarise_if(is.numeric, sum) %>% mutate_at(vars(Time:K_0), Div3)
   
   for(d in 2:Dias){
     
@@ -65,9 +78,9 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     }
     CH_i_tc <- purrr::reduce(Num, `+`)/purrr::reduce(Denom, `+`)^Sigma
     
-    df_out  <- df_out %>% purrr::map(~mutate(.x, p_G = (1 - K_0)*p_G)) 
+    df_out  <- df_out %>% purrr::map(~mutate(.x, p_G_c = (1 - K_0)*p_G)) 
     
-    df_out <- df_out %>% purrr::map(~mutate(.x, K_g = (1 - K_0)*K_g + K_0*(Sigma - 1)))
+    df_out <- df_out %>% purrr::map(~mutate(.x, K_g_c = (1 - K_0)*K_g + K_0*(Sigma - 1)))
     
     
     for(x in 1:3){
@@ -76,7 +89,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
       #Para cada Comuna
       for(R in 1:nrow(df_out[[x]])){
         n_i_g_eff <- foreach(i = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          ((1 - df_out[[x]]$p_G[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
+          ((1 - df_out[[x]]$p_G_c[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
         }
         df_out[[x]][R,]$n_i_g_eff <- sum(n_i_g_eff) 
       }
@@ -103,7 +116,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     for(x in 1:length(N_I_h_j_i)){
       for(i in 1:length(Nombres)){
         Temp <- foreach(j = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Infectados))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G[i])*0 + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
+          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Infectados))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G_c[i])*ifelse(Nombres[j] == Nombres[i], 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
         }
         N_I_h_j_i[[x]][,i] <- Temp
       }
@@ -115,7 +128,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     for(x in 1:length(N_A_h_j_i)){
       for(i in 1:length(Nombres)){
         Temp <- foreach(j = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Asintomaticos))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G[j])*0 + df_out[[x]]$p_G[j]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
+          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Asintomaticos))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G_c[j])*ifelse(Nombres[j] == Nombres[i], 1, 0) + df_out[[x]]$p_G_c[j]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
         }
         N_A_h_j_i[[x]][,i] <- Temp 
       }
@@ -128,7 +141,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
       Temp2 <- list()
       for(h in 1:3){
         temp <- foreach(j = 1:nrow(df_out[[g]]), .inorder = T, .packages = c("dplyr")) %dopar% {
-          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
+          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g_c[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g_c[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
         }
         Temp2[[h]] <- purrr::reduce(temp, `*`)
       }
@@ -141,7 +154,7 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     for(g in 1:3){
       df_out[[g]]$PI = NA
       df_out[[g]]$PI <-  foreach(i = 1:nrow(df_out[[g]]), .combine=c, .inorder = T, .packages = c("dplyr", "purrr")) %dopar%{
-        df_out[[g]]$p_G[i]*(df_out[[g]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(P_G)) + df_out[[g]]$p_G[i]*sum((Probs %>% dplyr::filter(destino == Nombres[i]) %>% select_if(is.numeric) %>% reduce(c))*df_out[[g]]$P_G)
+        df_out[[g]]$p_G_c[i]*(df_out[[g]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(P_G)) + df_out[[g]]$p_G_c[i]*sum((Probs %>% dplyr::filter(destino == Nombres[i]) %>% select_if(is.numeric) %>% reduce(c))*df_out[[g]]$P_G)
       }
     }
     
@@ -161,16 +174,26 @@ Modelo_Edad <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alpha_g, 
     }
     
     df_out <- Temp1
-    prevalencias <- df_out %>% bind_rows() %>% group_by(Comuna, Poblacion) %>% summarise(Infectados = sum(Infectados)) %>% mutate(Prevalencia = (Infectados/Poblacion)*100000) %>% ungroup() %>%  dplyr::pull(Prevalencia)
+    
+    
+    K <- df_out %>% bind_rows() %>% select(Comuna, Generacion, Infectados, Count) %>% group_by(Comuna) %>% summarise_if(is.numeric, sum) %>% 
+      mutate(Prev = (Infectados/Generacion)*100000, Count = Count/length(df_out), K_0 = case_when(Count > 0 & Count != Min_Days ~ K_Cuar,
+                                                                    Count == 0 & Prev >= Umbral ~ K_Cuar,
+                                                                    Count == 0 & Prev < Umbral ~ 0,
+                                                                    Count == Min_Days & Prev >= Umbral ~ K_Cuar,
+                                                                    Count == Min_Days & Prev < Umbral ~ 0),
+             Count = case_when(Count > 0 & Count != Min_Days ~ Count + 1,
+                               Count == 0 & Prev >= Umbral ~ Count + 1,
+                               Count == 0 & Prev < Umbral ~ 0,
+                               Count == Min_Days & Prev >= Umbral ~ 1,
+                               Count == Min_Days & Prev < Umbral ~ 0)) %>%
+      dplyr::select(K_0, Count)
+
+    
     
     for(i in 1:length(df_out)){
-      df_out[[i]]$Prevalencia <- prevalencias
-    }
-    
-    K <- df_out %>% bind_rows() %>% select(Comuna, Generacion, Infectados) %>% group_by(Comuna) %>% summarise_if(is.numeric, sum) %>% mutate(Prev = (Infectados/Generacion)*100000, K_0 = case_when(Prev >= Umbral ~ K_Cuar, Prev < Umbral ~ 0)) %>% pull(K_0)
-    
-    for(i in 1:length(df_out)){
-      df_out[[i]]$K_0 <- K
+      df_out[[i]]$K_0 <- K$K_0
+      df_out[[i]]$Count <- K$Count
     }
     
     
@@ -203,7 +226,13 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
   
   df_out <- df_out %>% purrr::map2(.y = K_g, ~mutate(.x, K_g = .y))
   
+  d = 1
+  
+  df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(d %in% Dias_Cuar ~ K_Cuar, !(d %in% Dias_Cuar) ~ 0)))
+  
   df_out <- df_out %>% purrr::map2(.y = p_G, ~mutate(.x, p_G = .y))
+  
+  df_out  <- df_out %>% purrr::map(~mutate(.x, p_G_c = (1 - K_0)*p_G))
   
   Mat  <- matrix(rep(0,(length(Nombres)*length(Nombres))), nrow = length(Nombres), ncol = length(Nombres))
   
@@ -224,7 +253,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     #Para cada Comuna
     for(R in 1:nrow(df_out[[x]])){
       n_i_g_eff <- foreach(i = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-        ((1 - df_out[[x]]$p_G[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
+        ((1 - df_out[[x]]$p_G_c[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
       }
       df_out[[x]][R,]$n_i_g_eff <- sum(n_i_g_eff) 
     }
@@ -238,11 +267,9 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     z_g[x] <- (df_out[[x]] %>% summarise(N = sum(Generacion)) %>% pull(N))/sum(Func(n_i_eff$n_i_eff/(df_out[[x]]$Area))*df_out[[x]]$n_i_g_eff)
   }
   
-  d = 1
   
-  df_out <- df_out %>% purrr::map(~mutate(.x, K_0 = case_when(d %in% Dias_Cuar ~ K_Cuar, !(d %in% Dias_Cuar) ~ 0)))
   
-  df_out <- df_out %>% purrr::map(~mutate(.x, K_g = (1 - K_0)*K_g + K_0*(Sigma - 1)))
+  df_out <- df_out %>% purrr::map(~mutate(.x, K_g_c = (1 - K_0)*K_g + K_0*(Sigma - 1)))
   
   Div3 <- function(x){
     return(x/3)
@@ -262,9 +289,9 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     }
     CH_i_tc <- purrr::reduce(Num, `+`)/purrr::reduce(Denom, `+`)^Sigma
     
-    df_out  <- df_out %>% purrr::map(~mutate(.x, p_G = (1 - K_0)*p_G)) 
+    df_out  <- df_out %>% purrr::map(~mutate(.x, p_G_c = (1 - K_0)*p_G)) 
     
-    df_out <- df_out %>% purrr::map(~mutate(.x, K_g = (1 - K_0)*K_g + K_0*(Sigma - 1)))
+    df_out <- df_out %>% purrr::map(~mutate(.x, K_g_c = (1 - K_0)*K_g + K_0*(Sigma - 1)))
     
     
     for(x in 1:3){
@@ -273,7 +300,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
       #Para cada Comuna
       for(R in 1:nrow(df_out[[x]])){
         n_i_g_eff <- foreach(i = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          ((1 - df_out[[x]]$p_G[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
+          ((1 - df_out[[x]]$p_G_c[i])*ifelse(Nombres[i] == df_out[[x]][R,]$Comuna, 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == df_out[[x]][R,]$Comuna) %>% pull(Nombres[i]))*(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(Generacion))
         }
         df_out[[x]][R,]$n_i_g_eff <- sum(n_i_g_eff) 
       }
@@ -300,7 +327,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     for(x in 1:length(N_I_h_j_i)){
       for(i in 1:length(Nombres)){
         Temp <- foreach(j = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Infectados))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G[i])*0 + df_out[[x]]$p_G[i]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
+          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Infectados))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G_c[i])*ifelse(Nombres[j] == Nombres[i], 1, 0) + df_out[[x]]$p_G_c[i]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
         }
         N_I_h_j_i[[x]][,i] <- Temp
       }
@@ -312,7 +339,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     for(x in 1:length(N_A_h_j_i)){
       for(i in 1:length(Nombres)){
         Temp <- foreach(j = 1:length(Nombres), .combine=c, .inorder = T, .packages = c("dplyr")) %dopar%{
-          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Asintomaticos))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G[j])*0 + df_out[[x]]$p_G[j]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
+          (df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion))*((df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Asintomaticos))/(df_out[[x]] %>% dplyr::filter(Comuna == Nombres[j]) %>% pull(Generacion)))*((1-df_out[[x]]$p_G_c[j])*ifelse(Nombres[j] == Nombres[i], 1, 0) + df_out[[x]]$p_G_c[j]*Probs %>% dplyr::filter(destino == Nombres[i]) %>% pull(Nombres[j]))
         }
         N_A_h_j_i[[x]][,i] <- Temp 
       }
@@ -325,7 +352,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
       Temp2 <- list()
       for(h in 1:3){
         temp <- foreach(j = 1:nrow(df_out[[g]]), .inorder = T, .packages = c("dplyr")) %dopar% {
-          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
+          (1 - betaA)^(z_g[g]*df_out[[g]]$K_g_c[j]*Func(x = n_i_eff$n_i_eff/(df_out[[x]]$Area))*C_G_H[g,h]*(N_A_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))*(1 - betaI)^(z_g[g]*df_out[[g]]$K_g_c[j]*Func(x = n_i_eff$n_i_eff/(df_out[[1]]$Suceptibles + df_out[[2]]$Suceptibles + df_out[[3]]$Suceptibles))*C_G_H[g,h]*(N_I_h_j_i[[h]][j,]/df_out[[h]]$n_i_g_eff))
         }
         Temp2[[h]] <- purrr::reduce(temp, `*`)
       }
@@ -338,7 +365,7 @@ Modelo_Edad_Total <- function(Inicio, df_out, Probs, betaI, betaA, K_g, Eta, Alp
     for(g in 1:3){
       df_out[[g]]$PI = NA
       df_out[[g]]$PI <-  foreach(i = 1:nrow(df_out[[g]]), .combine=c, .inorder = T, .packages = c("dplyr", "purrr")) %dopar%{
-        df_out[[g]]$p_G[i]*(df_out[[g]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(P_G)) + df_out[[g]]$p_G[i]*sum((Probs %>% dplyr::filter(destino == Nombres[i]) %>% select_if(is.numeric) %>% reduce(c))*df_out[[g]]$P_G)
+        df_out[[g]]$p_G_c[i]*(df_out[[g]] %>% dplyr::filter(Comuna == Nombres[i]) %>% pull(P_G)) + df_out[[g]]$p_G_c[i]*sum((Probs %>% dplyr::filter(destino == Nombres[i]) %>% select_if(is.numeric) %>% reduce(c))*df_out[[g]]$P_G)
       }
     }
     
