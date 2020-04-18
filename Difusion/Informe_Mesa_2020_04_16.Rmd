@@ -32,7 +32,9 @@ En este documento se mostrarán simulaciones destinadas a responder 3 puntos de 
 
 Para todas las simulaciones se usaron el las funciones descritas y disponibles en @derek_corcoran_barrios_2020_3756847, ahí también se encuentran las bases de datos con las que se realizaron estas simulaiciones
 
-## Extensión óptima de cuarentena total. Simulación del 15 abril al 14 junio
+## Cuarentena Nacional total
+
+### Extensión óptima de cuarentena total. Simulación del 15 abril al 14 junio
 
 Para obtener la extensión óptima de una cuarentena total a nivel nacional se realizaron 12 simulaciones distintas que parten el día 20 de abril. Se consideraron 3 extensiones de cuarentena nacional (7, 15 y 30 días) y 3 valores de grado de confinamiento o $\kappa_0$ distintos (0.5, 0.75 y 0.85, cada una representando cuarentenas con control leve, medio o fuerte). Para tener las condiciones iniciales del 20 de abril se modeló del 15 abril al 20 abril, manteniendo una cuarentena dinámica por comuna.
 
@@ -40,19 +42,16 @@ Para obtener la extensión óptima de una cuarentena total a nivel nacional se r
 Estas simulaciones se contrastaron con una cuarentena dinámica la cual se gatilla cuando el número de infectados llega a 40/100,000 casos activos confirmados. Una vez gatillada la cuarentena, esta durará como mínimo 7 días, y al pasar los 7 días se observa la prevalencia nuevamente para determinar si la cuarentena se levanta o se renueva por otros 7 días
 
 
-## Inicio óptimo de cuarentena total
+### Inicio óptimo de cuarentena total. Simulación del 15 abril al 14 junio
 
-Determinación de fechas de inicio considerando extensión óptima definida
-
-Esta parte asume que en la sección anterior se determinó la extensión optima que será simulada despúes de la cuarentena dinámica. Se simularán dos semanas sin cuarentena posterior a este periodo para ver los efectos.
-
-- 1. Desde el 15 abril cuarentena dinámica, 2. desde el 20 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-- 1. Desde el 15 abril cuarentena dinámica, 2. desde el 1 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-- 1. Desde el 15 abril cuarentena dinámica, 2. desde el 15 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-- 1. Desde el 15 abril cuarentena dinámica, 2. desde el 30 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-
+Extendiendo el ejercicio anterior se probaron cuarentenas nacionales con cuarentenas fuertes y medias empezando en los días 20 de Abril, 27 de Abril y 4 de mayo, con extenciones de 15 y 30 días, para medir el efecto del inicio de la fecha de cuarentena
 
 # Resultados
+
+## Cuarentena Nacional total
+
+### Extensión óptima de cuarentena total
+
 
 ```{r}
 
@@ -60,58 +59,62 @@ DF <- data.frame(Inicio = c("Total 7 días", "Total 15 días", "Total 30 días")
 
 # leemos para kappa = 0.5
 
-Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 7 días")
+Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Total 7 días")
 
-Results2 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_15_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 15 días")
+Results2 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_15_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Total 15 días")
 
-Results3 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_30_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 30 días")
+Results3 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_30_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Total 30 días")
 
 
 
 # leemos para kappa = 0.75
 
-Results4 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 7 días")
+Results4 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena media", Estrategia = "Total 7 días")
 
-Results5 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_15_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 15 días")
+Results5 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_15_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena media", Estrategia = "Total 15 días")
 
-Results6 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_30_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 30 días")
+Results6 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_30_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena media", Estrategia = "Total 30 días")
 
 ## Agregamos los resultados para kappa = 0.85
 
-Results7 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.85), Estrategia = "Total 7 días")
+Results7 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Total 7 días")
 
-Results8 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_15_Metropolitana.rds") %>% mutate(Kappa = as.character(0.85), Estrategia = "Total 15 días")
+Results8 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_15_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Total 15 días")
 
-Results9 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_30_Metropolitana.rds") %>% mutate(Kappa = as.character(0.85), Estrategia = "Total 30 días")
+Results9 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_30_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Total 30 días")
 
 ## Agregamos el resultado dinámico  y mínimo 7 días de cuarentena
 
-Results10 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Dinámica 7 días")
+Results10 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Dinámica 7 días")
+
+Results11 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 7 días")
+
+Results12 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Dinámica 7 días")
 
 
 ## Unimos todo
 
-Results <- list(Results1, Results2, Results3, Results4, Results5, Results6, Results7, Results8, Results9, Results10) %>% purrr::reduce(bind_rows)
-```
-
-## Nivel País
-
-```{r}
-Results_Pais <- Results %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
-"Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
-"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup()
+Results <- list(Results1, Results2, Results3, Results4, Results5, Results6, Results7, Results8, Results9, Results10, Results11, Results12) %>% purrr::reduce(bind_rows)%>% mutate(Kappa = fct_relevel(Kappa, "Cuarentena leve", "Cuarentena media", "Cuarentena fuerte"), Estrategia = fct_relevel(Estrategia, "Total 7 días", "Total 15 días", "Total 30 días"))
 ```
 
 
 ```{r}
-ggplot(Results_Pais, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)  + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 1000000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+#Results_Pais <- Results %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
+#"Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
+#"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% #ungroup() 
+```
+
+
+```{r}
+#ggplot(Results_Pais, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)  + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2)  + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) #+ annotate("text", x = lubridate::dmy("19/04/2020"), y = 1000000, label = "Inicio cuarentena", angle = 90)
 ```
 
 ```{r}
-ggplot(Results_Pais, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 150000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+#ggplot(Results_Pais, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = #vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = #lubridate::dmy("20/04/2020"), lty = 2)  + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), #lty = 2, show.legend = F) #+ annotate("text", x = lubridate::dmy("19/04/2020"), y = 150000, label = #"Inicio cuarentena", angle = 90)
 ```
 
-## Región Metropolitana
+Si observamos los resultados para la totalidad de la región para el número de infectados activos figuras \@ref(fig:InfectadosRM) y \@ref(fig:UCIRM) vemos que cuando empezamos cuarentenas nacionales el día 20 de abril por 7, 15 o 30 días, el comportamiento de el número mas altó de infectados y de pacientes en Unidad de Cuidado Intensivo variarán dependiendo de la intensidad de la cuarentena. Cuanto mas fuerte sea la cuarentena mas se desplaza el peak de la curva hacia al futuro. Sin embargo en el caso de las Cuarentenas nacionales, esto no disminuye el peak de la curva notoriamente, salvo en el caso del lockdown nacional de 30 días con cuarentena leve.
+
 
 ```{r}
 Results_RM_Total <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
@@ -120,13 +123,31 @@ Results_RM_Total <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fec
 ```
 
 
-```{r}
-ggplot(Results_RM_Total, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+```{r InfectadosRM, fig.cap= "Evolución de número de infectados en el tiempo en la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente"}
+ggplot(Results_RM_Total, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) # + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90)
 ```
 
+Al tener una cuarentena de 30 días con de cuarentena leve, el lecantamiento de esta coincide con un momento posterior al peak de infectados como se ve en la figura \@ref(fig:InfectadosRM), esto parece ser que es lo que rompe el equilibrio, que la cuarentena termine después del peak.
+
+Esto se traduce tambien en una disminución fuerte en el número mas alto de personas que requerirán de estar Hospitalizadas en Unidades de Cuidado Intensivo (figura \@ref(fig:UCIRM)).
+
 ```{r}
+Dias_Cuarentena <- Results %>% dplyr::filter(Cuarentena == "Cuarentena", Comuna != "pais") %>% group_by(Comuna, Estrategia, Kappa) %>% summarise(Dias_De_Cuarentena = n()) %>% arrange(desc(Dias_De_Cuarentena)) %>% group_by(Estrategia, Kappa) %>% summarise_if(is.numeric,.funs = c(mean, sd)) %>% rename("Días promedio"= fn1, Desviacion = fn2, "Intensidad de Cuarentena" = Kappa)
+```
+
+
+
+```{r UCIRM, fig.cap= "Evolución de número de pacientes en unidad de Cuidado Intensivo en el tiempo en la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente"}
 ggplot(Results_RM_Total, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)
 ```
+
+Al ver el comportamiento de la cuarentena adaptativa en la figura \@ref(fig:InfectadosRM), uno podría pensar que es mas conveniente el realizar una cuarentena adaptativa mas que una cuarentena nacional, Sin embargo, la cuarentena adaptativa implica muchos más días totales en cuarentena, y generar una cuarentena mucho más intensa como vemos en la tabla \@ref(tab:DiasCuar)
+
+```{r DiasCuar}
+kable(Dias_Cuarentena, booktabs = T, digits = 1, caption = "Numero de días promedio de cuarentena según estrategia e intensidad de cuarentena")
+
+```
+
 
 ## Nivel Comunal Región Metropolitana
 
@@ -138,7 +159,7 @@ Results_Comunal <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fech
 
 
 ```{r}
-Eficiencia <- Results_Comunal %>% dplyr::filter(Kappa == 0.5) %>% group_by(Estrategia, Comuna) %>% dplyr::filter(UCI == max(UCI)) %>% dplyr::select(Estrategia, Comuna, UCI, Fecha, Poblacion) %>% ungroup() %>% group_by(Comuna) %>% dplyr::filter(UCI == max(UCI) | UCI == min(UCI)) %>% ungroup() %>% dplyr::select(-Fecha)
+Eficiencia <- Results_Comunal %>% dplyr::filter(Kappa == "Cuarentena leve") %>% group_by(Estrategia, Comuna) %>% dplyr::filter(UCI == max(UCI)) %>% dplyr::select(Estrategia, Comuna, UCI, Fecha, Poblacion) %>% ungroup() %>% group_by(Comuna) %>% dplyr::filter(UCI == max(UCI) | UCI == min(UCI)) %>% ungroup() %>% dplyr::select(-Fecha)
 
 Eficiencia_Max <- Eficiencia %>% group_by(Comuna) %>% dplyr::select(-Estrategia) %>% dplyr::filter(UCI == max(UCI)) %>% rename(UCI_max = UCI) %>% ungroup()
 
@@ -152,10 +173,14 @@ Extremos <- Eficiencia[c(1:8,45:52),] %>% pull(Comuna)
 
 
 
-```{r}
-Graph_Comunal <- Results_Comunal %>% dplyr::filter(Comuna %in% Extremos, Kappa == 0.5)
+```{r UCIComunal, fig.cap= "Evolución de número de pacientes en unidad de Cuidado Intensivo en el tiempo en comunas de la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente"}
+Graph_Comunal <- Results_Comunal %>% dplyr::filter(Comuna %in% Extremos, Kappa == "Cuarentena leve")
 
 ggplot(Graph_Comunal, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_wrap(~Comuna, scales = "free_y") + theme_bw() + scale_y_continuous(labels = comma)
 ```
 
+# Recomendaciones
 
+En el caso de empezar una cuarentena el día lunes 20 de Abril
+
+# Referencias

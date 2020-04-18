@@ -108,72 +108,93 @@ En este documento se mostrarán simulaciones destinadas a responder 3 puntos de 
 
 Para todas las simulaciones se usaron el las funciones descritas y disponibles en Corcoran and Graells (2020), ahí también se encuentran las bases de datos con las que se realizaron estas simulaiciones
 
+\hypertarget{cuarentena-nacional-total}{%
+\subsection{Cuarentena Nacional total}\label{cuarentena-nacional-total}}
+
 \hypertarget{extensiuxf3n-uxf3ptima-de-cuarentena-total.-simulaciuxf3n-del-15-abril-al-14-junio}{%
-\subsection{Extensión óptima de cuarentena total. Simulación del 15 abril al 14 junio}\label{extensiuxf3n-uxf3ptima-de-cuarentena-total.-simulaciuxf3n-del-15-abril-al-14-junio}}
+\subsubsection{Extensión óptima de cuarentena total. Simulación del 15 abril al 14 junio}\label{extensiuxf3n-uxf3ptima-de-cuarentena-total.-simulaciuxf3n-del-15-abril-al-14-junio}}
 
 Para obtener la extensión óptima de una cuarentena total a nivel nacional se realizaron 12 simulaciones distintas que parten el día 20 de abril. Se consideraron 3 extensiones de cuarentena nacional (7, 15 y 30 días) y 3 valores de grado de confinamiento o \(\kappa_0\) distintos (0.5, 0.75 y 0.85, cada una representando cuarentenas con control leve, medio o fuerte). Para tener las condiciones iniciales del 20 de abril se modeló del 15 abril al 20 abril, manteniendo una cuarentena dinámica por comuna.
 
 Estas simulaciones se contrastaron con una cuarentena dinámica la cual se gatilla cuando el número de infectados llega a 40/100,000 casos activos confirmados. Una vez gatillada la cuarentena, esta durará como mínimo 7 días, y al pasar los 7 días se observa la prevalencia nuevamente para determinar si la cuarentena se levanta o se renueva por otros 7 días
 
-\hypertarget{inicio-uxf3ptimo-de-cuarentena-total}{%
-\subsection{Inicio óptimo de cuarentena total}\label{inicio-uxf3ptimo-de-cuarentena-total}}
+\hypertarget{inicio-uxf3ptimo-de-cuarentena-total.-simulaciuxf3n-del-15-abril-al-14-junio}{%
+\subsubsection{Inicio óptimo de cuarentena total. Simulación del 15 abril al 14 junio}\label{inicio-uxf3ptimo-de-cuarentena-total.-simulaciuxf3n-del-15-abril-al-14-junio}}
 
-Determinación de fechas de inicio considerando extensión óptima definida
-
-Esta parte asume que en la sección anterior se determinó la extensión optima que será simulada despúes de la cuarentena dinámica. Se simularán dos semanas sin cuarentena posterior a este periodo para ver los efectos.
-
-\begin{itemize}
-\item
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \tightlist
-  \item
-    Desde el 15 abril cuarentena dinámica, 2. desde el 20 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-  \end{enumerate}
-\item
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \tightlist
-  \item
-    Desde el 15 abril cuarentena dinámica, 2. desde el 1 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-  \end{enumerate}
-\item
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \tightlist
-  \item
-    Desde el 15 abril cuarentena dinámica, 2. desde el 15 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-  \end{enumerate}
-\item
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \tightlist
-  \item
-    Desde el 15 abril cuarentena dinámica, 2. desde el 30 mayo cuarentena nacional por el número de días generado por la simulación anterior y 3. dos semanas sin cuarentena
-  \end{enumerate}
-\end{itemize}
+Extendiendo el ejercicio anterior se probaron cuarentenas nacionales con cuarentenas fuertes y medias empezando en los días 20 de Abril, 27 de Abril y 4 de mayo, con extenciones de 15 y 30 días, para medir el efecto del inicio de la fecha de cuarentena
 
 \hypertarget{resultados}{%
 \section{Resultados}\label{resultados}}
 
-\hypertarget{nivel-pauxeds}{%
-\subsection{Nivel País}\label{nivel-pauxeds}}
+\hypertarget{cuarentena-nacional-total-1}{%
+\subsection{Cuarentena Nacional total}\label{cuarentena-nacional-total-1}}
 
-\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/unnamed-chunk-3-1.pdf}
+\hypertarget{extensiuxf3n-uxf3ptima-de-cuarentena-total}{%
+\subsubsection{Extensión óptima de cuarentena total}\label{extensiuxf3n-uxf3ptima-de-cuarentena-total}}
 
-\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/unnamed-chunk-4-1.pdf}
+Si observamos los resultados para la totalidad de la región para el número de infectados activos figuras \ref{fig:InfectadosRM} y \ref{fig:UCIRM} vemos que cuando empezamos cuarentenas nacionales el día 20 de abril por 7, 15 o 30 días, el comportamiento de el número mas altó de infectados y de pacientes en Unidad de Cuidado Intensivo variarán dependiendo de la intensidad de la cuarentena. Cuanto mas fuerte sea la cuarentena mas se desplaza el peak de la curva hacia al futuro. Sin embargo en el caso de las Cuarentenas nacionales, esto no disminuye el peak de la curva notoriamente, salvo en el caso del lockdown nacional de 30 días con cuarentena leve.
 
-\hypertarget{regiuxf3n-metropolitana}{%
-\subsection{Región Metropolitana}\label{regiuxf3n-metropolitana}}
+\begin{figure}
+\centering
+\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/InfectadosRM-1.pdf}
+\caption{\label{fig:InfectadosRM}Evolución de número de infectados en el tiempo en la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente}
+\end{figure}
 
-\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/unnamed-chunk-6-1.pdf}
+Al tener una cuarentena de 30 días con de cuarentena leve, el lecantamiento de esta coincide con un momento posterior al peak de infectados como se ve en la figura \ref{fig:InfectadosRM}, esto parece ser que es lo que rompe el equilibrio, que la cuarentena termine después del peak.
 
-\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/unnamed-chunk-7-1.pdf}
+Esto se traduce tambien en una disminución fuerte en el número mas alto de personas que requerirán de estar Hospitalizadas en Unidades de Cuidado Intensivo (figura \ref{fig:UCIRM}).
+
+\begin{figure}
+\centering
+\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/UCIRM-1.pdf}
+\caption{\label{fig:UCIRM}Evolución de número de pacientes en unidad de Cuidado Intensivo en el tiempo en la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente}
+\end{figure}
+
+Al ver el comportamiento de la cuarentena adaptativa en la figura \ref{fig:InfectadosRM}, uno podría pensar que es mas conveniente el realizar una cuarentena adaptativa mas que una cuarentena nacional, Sin embargo, la cuarentena adaptativa implica muchos más días totales en cuarentena, y generar una cuarentena mucho más intensa como vemos en la tabla \ref{tab:DiasCuar}
+
+\begin{table}
+
+\caption{\label{tab:DiasCuar}Numero de días promedio de cuarentena según estrategia e intensidad de cuarentena}
+\centering
+\begin{tabular}[t]{llrr}
+\toprule
+Estrategia & Intensidad de Cuarentena & Días promedio & Desviacion\\
+\midrule
+Total 7 días & Cuarentena leve & 10.2 & 1.5\\
+Total 7 días & Cuarentena media & 10.2 & 1.6\\
+Total 7 días & Cuarentena fuerte & 10.2 & 1.6\\
+Total 15 días & Cuarentena leve & 18.2 & 1.5\\
+Total 15 días & Cuarentena media & 18.2 & 1.6\\
+\addlinespace
+Total 15 días & Cuarentena fuerte & 18.2 & 1.6\\
+Total 30 días & Cuarentena leve & 33.2 & 1.5\\
+Total 30 días & Cuarentena media & 33.2 & 1.6\\
+Total 30 días & Cuarentena fuerte & 33.2 & 1.6\\
+Dinámica 7 días & Cuarentena leve & 58.2 & 1.7\\
+\addlinespace
+Dinámica 7 días & Cuarentena media & 56.4 & 3.4\\
+Dinámica 7 días & Cuarentena fuerte & 49.7 & 3.9\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \hypertarget{nivel-comunal-regiuxf3n-metropolitana}{%
 \subsection{Nivel Comunal Región Metropolitana}\label{nivel-comunal-regiuxf3n-metropolitana}}
 
-\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/unnamed-chunk-10-1.pdf}
+\begin{figure}
+\centering
+\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/UCIComunal-1.pdf}
+\caption{\label{fig:UCIComunal}Evolución de número de pacientes en unidad de Cuidado Intensivo en el tiempo en comunas de la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente}
+\end{figure}
+
+\hypertarget{recomendaciones}{%
+\section{Recomendaciones}\label{recomendaciones}}
+
+En el caso de empezar una cuarentena el día lunes 20 de Abril
+
+\hypertarget{referencias}{%
+\section*{Referencias}\label{referencias}}
+\addcontentsline{toc}{section}{Referencias}
 
 \hypertarget{refs}{}
 \leavevmode\hypertarget{ref-arenas2020mathematical}{}%
