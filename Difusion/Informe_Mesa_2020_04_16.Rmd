@@ -1,0 +1,116 @@
+---
+title: "Informe 3"
+author: "Derek Corcoran, Giorgia Graells, Horacio Samaniego, Pablo Marquet"
+date: "20/04/2020"
+output:
+    bookdown::pdf_document2:
+      keep_tex: true
+      fig_caption: true
+      toc: false
+bibliography: Biblio.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, tidy = TRUE, tidy.opts = list(blank = FALSE, width.cutoff = 60))
+library(formatR)
+library(kableExtra)
+library(scales)
+library(tidyverse)
+```
+
+
+
+# Resultados
+
+```{r}
+
+DF <- data.frame(Inicio = c("Total 7 días", "Total 15 días", "Total 30 días"), Fecha = c(lubridate::dmy("20/04/2020")+ 7, lubridate::dmy("20/04/2020")+ 15,lubridate::dmy("20/04/2020")+ 30))
+
+# leemos para kappa = 0.5
+
+Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 7 días")
+
+Results2 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_15_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 15 días")
+
+Results3 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_30_Metropolitana.rds") %>% mutate(Kappa = as.character(0.5), Estrategia = "Total 30 días")
+
+
+
+# leemos para kappa = 0.75
+
+Results4 <-read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_7_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 7 días")
+
+Results5 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_15_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 15 días")
+
+Results6 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Total_30_Metropolitana.rds") %>% mutate(Kappa = as.character(0.75), Estrategia = "Total 30 días")
+
+## Unimos todo
+
+Results <- list(Results1, Results2, Results3, Results4, Results5, Results6) %>% purrr::reduce(bind_rows)
+```
+
+## Nivel País
+
+```{r}
+Results_Pais <- Results %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
+"Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
+"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup()
+```
+
+
+```{r}
+ggplot(Results_Pais, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)  + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 1000000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+```
+
+```{r}
+ggplot(Results_Pais, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 150000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+```
+
+## Región Metropolitana
+
+```{r}
+Results_RM_Total <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
+"Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
+"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup()
+```
+
+
+```{r}
+ggplot(Results_RM_Total, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) 
+```
+
+```{r}
+ggplot(Results_RM_Total, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)
+```
+
+## Nivel Comunal Región Metropolitana
+
+```{r}
+Results_Comunal <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fecha, Kappa, Estrategia, Comuna) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Comuna", "Kappa", "Estrategia", "Poblacion", "Infectados", 
+"Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
+"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup()
+```
+
+
+```{r}
+Eficiencia <- Results_Comunal %>% dplyr::filter(Kappa == 0.5) %>% group_by(Estrategia, Comuna) %>% dplyr::filter(UCI == max(UCI)) %>% dplyr::select(Estrategia, Comuna, UCI, Fecha, Poblacion) %>% ungroup() %>% group_by(Comuna) %>% dplyr::filter(UCI == max(UCI) | UCI == min(UCI)) %>% ungroup() %>% dplyr::select(-Fecha)
+
+Eficiencia_Max <- Eficiencia %>% group_by(Comuna) %>% dplyr::select(-Estrategia) %>% dplyr::filter(UCI == max(UCI)) %>% rename(UCI_max = UCI) %>% ungroup()
+
+Eficiencia_Min <- Eficiencia %>% group_by(Comuna) %>% dplyr::select(-Estrategia) %>% dplyr::filter(UCI == min(UCI)) %>% rename(UCI_min = UCI) %>% ungroup()
+
+Eficiencia <- suppressMessages(full_join(Eficiencia_Max, Eficiencia_Min))
+Eficiencia<- Eficiencia %>% mutate(Eficiencia = ((UCI_max - UCI_min)/Poblacion)*100000) %>% arrange(desc(Eficiencia))
+
+Extremos <- Eficiencia[c(1:8,45:52),] %>% pull(Comuna)
+```
+
+
+
+```{r}
+Graph_Comunal <- Results_Comunal %>% dplyr::filter(Comuna %in% Extremos, Kappa == 0.5)
+
+ggplot(Graph_Comunal, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_wrap(~Comuna, scales = "free_y") + theme_bw() + scale_y_continuous(labels = comma)
+```
+
+
