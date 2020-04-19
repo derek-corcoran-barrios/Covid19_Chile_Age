@@ -187,10 +187,53 @@ Dinámica 7 días & Cuarentena fuerte & 49.7 & 3.9\\
 \caption{\label{fig:UCIComunal}Evolución de número de pacientes en unidad de Cuidado Intensivo en el tiempo en comunas de la Región Metropolitana, dadas distintas estrategias, la linea punteada negra es la fecha en que parte la cuarentena nacional para todas las Cuarentenas totales, las lineas roja, verde y azul representan cuando terminan las cuarentenas totales de 7, 15 y 30 días respectivamente}
 \end{figure}
 
+\hypertarget{inicio-uxf3ptimo-de-cuarentena-total}{%
+\subsubsection{Inicio óptimo de cuarentena total}\label{inicio-uxf3ptimo-de-cuarentena-total}}
+
+\begin{figure}
+\centering
+\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/InicioDuracion-1.pdf}
+\caption{\label{fig:InicioDuracion}Efecto de la fecha de inicio, duración de cuarentena y número de días de la cuarentena Nacional}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{Informe_Mesa_2020_04_16_files/figure-latex/InicioDuracionUCI-1.pdf}
+\caption{\label{fig:InicioDuracionUCI}Efecto de la fecha de inicio, duración de cuarentena y número de días de la cuarentena Nacional en el número de pacientes de Estado Crítico}
+\end{figure}
+
+\begin{table}
+
+\caption{\label{tab:DiasCuar2}Numero de días promedio de cuarentena según estrategia e intensidad de cuarentena}
+\centering
+\begin{tabular}[t]{lllrr}
+\toprule
+Intensidad cuarentena & Inicio & Duracion & Dias promedio & Desviación\\
+\midrule
+Cuarentena fuerte & 20 de Abril & 15 días & 18.2 & 1.6\\
+Cuarentena leve & 20 de Abril & 15 días & 18.2 & 1.5\\
+Cuarentena fuerte & 27 de Abril & 15 días & 25.1 & 1.7\\
+Cuarentena leve & 27 de Abril & 15 días & 25.2 & 1.7\\
+Cuarentena fuerte & 4 de Mayo & 15 días & 31.2 & 1.9\\
+\addlinespace
+Cuarentena leve & 4 de Mayo & 15 días & 32.2 & 1.7\\
+Cuarentena fuerte & 20 de Abril & 30 días & 33.2 & 1.6\\
+Cuarentena leve & 20 de Abril & 30 días & 33.2 & 1.5\\
+Cuarentena fuerte & 27 de Abril & 30 días & 40.1 & 1.7\\
+Cuarentena leve & 27 de Abril & 30 días & 40.2 & 1.7\\
+\addlinespace
+Cuarentena fuerte & 4 de Mayo & 30 días & 46.2 & 1.9\\
+Cuarentena leve & 4 de Mayo & 30 días & 47.2 & 1.7\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \hypertarget{recomendaciones}{%
 \section{Recomendaciones}\label{recomendaciones}}
 
-En el caso de empezar una cuarentena el día lunes 20 de Abril
+Considerando tanto los peaks, la estrategia más adecuada según las simulaciones entregadas sería el empezar con una cuarentena leve a nivel nacional por 15 días desde el lunes 04 de Mayo, realizandose una cuarentena dinámica antes de llegar a esa fecha. Esta estrategia reduce de forma significativa el peak de infectados y de pacientes que necesitarán del uso de Unidades de Cuidado Intensivo. Considerando los días de cuarentena (cuarentena adaptativa y cuarentena total), esta estrategia necesita una menor cantidad de días totales para disminuir el número de afectados (ver tablas \ref{tab:DiasCuar} y \ref{tab:DiasCuar2}).
+
+En terminos prácticos, una cuarentena menos estricta, implica una cuarentena similar a la actual, donde en lo posible continuamos con distanciamiento social, establecimientos de eduacación cerrados, con teletrabajo. Dado que todos estas simulaciones consideraron movilidad muy reducida del grupo de menores de 25 años, esto tuvo en todo momento considerado el no tener clases presenciales.
 
 \hypertarget{referencias}{%
 \section*{Referencias}\label{referencias}}
