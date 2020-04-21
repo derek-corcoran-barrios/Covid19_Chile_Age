@@ -87,14 +87,20 @@ Results9 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolit
 
 Results10 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Dinámica 7 días")
 
-Results11 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 7 días")
+Results11 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_7_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 7 días")
 
 Results12 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Dinamica_7_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Dinámica 7 días")
+
+Results13 <-   read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results.rds")$Results %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Dinámica 15 días")
+
+Results14 <-   read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_15_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 15 días")
+
+Results15 <-   read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Dinamica_15_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena leve", Estrategia = "Dinámica 15 días")
 
 
 ## Unimos todo
 
-Results <- list(Results1, Results2, Results3, Results4, Results5, Results6, Results7, Results8, Results9, Results10, Results11, Results12) %>% purrr::reduce(bind_rows)%>% mutate(Kappa = fct_relevel(Kappa, "Cuarentena leve", "Cuarentena media", "Cuarentena fuerte"), Estrategia = fct_relevel(Estrategia, "Total 7 días", "Total 15 días", "Total 30 días"))
+Results <- list(Results1, Results2, Results3, Results4, Results5, Results6, Results7, Results8, Results9, Results10, Results11, Results12, Results13, Results14, Results15) %>% purrr::reduce(bind_rows)%>% mutate(Kappa = fct_relevel(Kappa, "Cuarentena leve", "Cuarentena media", "Cuarentena fuerte"), Estrategia = fct_relevel(Estrategia, "Total 7 días", "Total 15 días", "Total 30 días", "Dinámica 7 días"))
 ```
 
 
@@ -119,7 +125,7 @@ Si observamos los resultados para la totalidad de la región para el número de 
 ```{r}
 Results_RM_Total <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fecha, Kappa, Estrategia) %>% summarise_if(is.numeric, sum) %>% dplyr::select("Fecha", "Kappa", "Estrategia", "Poblacion", "Infectados", 
 "Suceptibles", "Expuestos", "Asintomaticos", "UCI", "Muerto", 
-"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup()
+"Recuperados", "Time") %>% mutate(Infectados_Acumulados = Infectados + UCI + Muerto + Recuperados) %>% ungroup() %>% dplyr::filter(Fecha <= lubridate::dmy("14/06/2020"))
 ```
 
 
@@ -127,10 +133,41 @@ Results_RM_Total <- Results %>% dplyr::filter(Comuna != "pais") %>% group_by(Fec
 ggplot(Results_RM_Total, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma) + geom_vline(xintercept = lubridate::dmy("20/04/2020"), lty = 2) + geom_vline(data = DF, aes (xintercept = Fecha, color = Inicio), lty = 2, show.legend = F) # + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90)
 ```
 
+
+
+```{r}
+## Leemos diámicas de 7 días
+Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_7_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 7 días")
+  
+Results2 <-   read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Dinamica_7_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Dinámica 7 días")
+
+## Leemos diámicas de 7 días
+
+Results3 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_75_Dinamica_15_Inicio_15_Abril_Metropolitana.rds")$Results %>% mutate(Kappa = "Cuarentena media", Estrategia = "Dinámica 15 días")
+  
+Results4 <-   read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results.rds")$Results %>% mutate(Kappa = "Cuarentena fuerte", Estrategia = "Dinámica 15 días")
+
+
+Results_RM_Din <- list(Results1, Results2, Results3, Results4) %>% reduce(bind_rows) %>% group_by(Kappa, Estrategia, Fecha) %>% summarise_if(is.numeric, sum) 
+
+```
+
+
+
+```{r InfectadosRMDin, fig.cap= "Evolución de número de infectados en el tiempo en la Región Metropolitana, dadas distintas estrategias"}
+ggplot(Results_RM_Din, aes(x = Fecha, y = Infectados)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)  # + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90)
+```
+
+
+```{r UCIRMDin, fig.cap= "Evolución de número de infectados en el tiempo en la Región Metropolitana, dadas distintas estrategias"}
+ggplot(Results_RM_Din, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategia)) + facet_grid(rows = vars(Kappa)) + theme_bw() + scale_y_continuous(labels = comma)  # + annotate("text", x = lubridate::dmy("19/04/2020"), y = 500000, label = "Inicio cuarentena", angle = 90)
+```
+
+
 Al tener una cuarentena de 30 días con de cuarentena leve, el lecantamiento de esta coincide con un momento posterior al peak de infectados como se ve en la figura \@ref(fig:InfectadosRM), esto parece ser que es lo que rompe el equilibrio, que la cuarentena termine después del peak.
 
 Esto se traduce tambien en una disminución fuerte en el número mas alto de personas que requerirán de estar Hospitalizadas en Unidades de Cuidado Intensivo (figura \@ref(fig:UCIRM)).
-
+  
 ```{r}
 Dias_Cuarentena <- Results %>% dplyr::filter(Cuarentena == "Cuarentena", Comuna != "pais") %>% group_by(Comuna, Estrategia, Kappa) %>% summarise(Dias_De_Cuarentena = n()) %>% arrange(desc(Dias_De_Cuarentena)) %>% group_by(Estrategia, Kappa) %>% summarise_if(is.numeric,.funs = c(mean, sd)) %>% rename("Días promedio"= fn1, Desviacion = fn2, "Intensidad de Cuarentena" = Kappa)
 ```
@@ -189,9 +226,9 @@ ggplot(Graph_Comunal, aes(x = Fecha, y = UCI)) + geom_line(aes(color = Estrategi
 
 # leemos para Inicio 20 de abril y 15 días
 
-Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_15_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Inicio = "20 de Abril", Duracion = "15 días")
+Results1 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_15_Inicio_20_Abril_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Inicio = "20 de Abril", Duracion = "15 días")
 
-Results2 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_15_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Inicio = "20 de Abril", Duracion = "15 días")
+Results2 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_15_Inicio_20_Abril_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Inicio = "20 de Abril", Duracion = "15 días")
 
 # leemos para Inicio 27 de abril y 15 días
 
@@ -208,9 +245,9 @@ Results6 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolit
 
 # leemos para Inicio 20 de abril y 30 días
 
-Results7 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_30_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Inicio = "20 de Abril", Duracion = "30 días")
+Results7 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_5_Total_30_Inicio_20_Abril_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena leve", Inicio = "20 de Abril", Duracion = "30 días")
 
-Results8 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_30_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Inicio = "20 de Abril", Duracion = "30 días")
+Results8 <- read_rds("/home/derek/Documents/Covid19_Chile_Age/Results/Metropolitana/Results_2020_04_15_K_0_85_Total_30_Inicio_20_Abril_Metropolitana.rds") %>% mutate(Kappa = "Cuarentena fuerte", Inicio = "20 de Abril", Duracion = "30 días")
 
 # leemos para Inicio 27 de abril y 30 días
 
