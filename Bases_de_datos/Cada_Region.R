@@ -19,7 +19,7 @@ githubURL <- ("https://raw.githubusercontent.com/jorgeperezrojas/covid19-data/ma
 download.file(githubURL,"COVID_tasaXcomunas.csv", method="curl")
 
 
-Pais <- read_csv("COVID_tasaXcomunas.csv") 
+Pais <- read_csv("COVID_tasaXcomunas.csv")
 
 Pais <- Pais %>% mutate_at(as.numeric, .vars = vars(5:ncol(Pais))) %>% dplyr::select(-codigo_region, -codigo_comuna) %>% pivot_longer(cols = c(-region, -comuna), names_to = "Fecha", values_to = "Acumulados") %>% mutate(Fecha = mdy(Fecha), Acumulados = ifelse(is.na(Acumulados), 0, Acumulados)) %>% rename(Comuna = comuna)  %>% mutate(Comuna = str_to_lower(Comuna)) %>% mutate(Comuna = str_remove_all(Comuna, " \\*")) %>%
   mutate(Comuna = str_replace_all(Comuna, "á", "a"), Comuna = str_replace_all(Comuna, "é", "e"), Comuna = str_replace_all(Comuna, "í", "i"), Comuna = str_replace_all(Comuna, "ó", "o"), Comuna = str_replace_all(Comuna, "ú", "u")) %>% dplyr::filter(Comuna != "total") %>% mutate(Comuna = str_replace_all(Comuna, "aisen", "aysen")) %>% 
